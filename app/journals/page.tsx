@@ -1,20 +1,22 @@
 'use client';
 import { useSearchParams } from "next/navigation";
-import { RetrievePages } from "../lib/action";
+import { gen_RetrievePages, RetrievePages } from "../lib/action";
 import { useEffect, useState } from "react";
 import { CiPen } from "react-icons/ci";
 import { FaRegTrashCan } from "react-icons/fa6";
 import { BiTrash } from "react-icons/bi";
-
+import { AES,enc } from "crypto-ts";
 export default  function Journals() { 
-    const searchParams = useSearchParams();
+const searchParams = useSearchParams();
   const message = searchParams.get('message');
   const [Pages,setPages] =useState([])
   const [Loading , setLoading] = useState<boolean>(true)
   useEffect(() => {
     const fetchData = async () => {
         try {
-            const data = await RetrievePages();
+            var data = await gen_RetrievePages();
+           
+            console.log(data)
             setPages(data);
         } catch (error) {
             console.error("Failed to fetch pages:", error);
@@ -24,7 +26,6 @@ export default  function Journals() {
     };
 
       fetchData();
-      console.log(Pages)
   }, []);
     if (Loading) {
         return (
@@ -50,20 +51,23 @@ export default  function Journals() {
                     {e["!'(w"].map((tag:any)=>(<p className="uppercase text-red-500">{tag.name}</p>))}
                 </div>
                 <div className=" flex-grow  flex justify-around items-center">
-                    <p className="text-white">{e.created_time}</p>
-                    <p className="text-green-400">{e.updated_time}</p>
+                                <p className="text-white">{e.created_time}</p>
+                                {e.created_time !== e.updated_time?(
+                                    <p className="text-green-400">{e.updated_time}</p>
+                                ) :null
+                                }
 
                 </div> 
                     </div>
                     <div className="w-[10%] flex flex-col">
                         <div className="flex-grow  flex items-center justify-center">
                                 <a href="" className="flex items-center justify-center">
-                            <CiPen  size={"50%"} className="text-white transition-all hover:size-3/5 hover:text-red-400 "/>
+                            <CiPen  size={"40%"} className="text-white transition-all hover:size-1/2 hover:text-red-500 "/>
                                 </a>
                         </div>
                             <div className="flex-grow  flex items-center justify-center">
                                 <a href="http://" className="flex items-center justify-center">
-                            <FaRegTrashCan size={"40%"} className="text-white transition-all hover:size-1/2 hover:text-red-500 "  />
+                            <FaRegTrashCan size={"30%"} className="text-white transition-all hover:size-2/5 hover:text-red-500 "  />
                                 </a>
                         </div>
                     </div>

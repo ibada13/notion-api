@@ -25,7 +25,7 @@ export async function RetriveDatabase()  {
 
 
 const CreatePage = FormSchema;
-export async function fakecipher(title: any, tag: any, things: any) {
+export async function fakecipher(title: any) {
   const cipher = AES.encrypt(title,String(process.env.KEY)).toString()
   console.log(cipher)
   console.log(AES.decrypt(cipher  ,String(process.env.KEY)).toString(enc.Utf8))
@@ -242,4 +242,25 @@ export async function RetrievePages() {
   }
   
 }
+function decrypt(title: string) { 
+  const data = AES.decrypt(title, String(process.env.KEY)).toString(enc.Utf8);
+  return data;
+ }
+export async function gen_RetrievePages() { 
+  var data = await RetrievePages()
+  const puredata = data.map((e: any) => { 
+      return {
+        ...e,
+          "title":AES.decrypt(String(e["title"] ) ,String(process.env.KEY)).toString(enc.Utf8),
+        }
+}
+  )
+  return puredata
+}
 
+export async function Retrieveblock(blockId:string) { 
+  const response = await notion.blocks.retrieve({
+    block_id: blockId,
+  });
+  console.log(response)
+}
