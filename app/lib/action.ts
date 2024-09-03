@@ -1,6 +1,20 @@
-// 'use client';
+'use server';
 const { Client } = require('@notionhq/client');
-import { child_block_data_type , color, rich_text_type, Tag} from "./definitions";
+import { redirect } from "next/navigation";
+import { child_block_data_type , color, rich_text_type, State, Tag} from "./definitions";
+import {z, ZodError} from 'zod';
+import { revalidatePath } from "next/cache";
+import { AES ,enc,lib} from "crypto-ts";
+const FormSchema = z.object({
+    title: z.string(), 
+  tags: z.array(z.string()),
+   things:z.object( {
+    positive_things:z.string() ,
+    negative_things:z.string() ,
+    other_things:z.string() ,
+  })
+
+});
 const notion = new Client({ auth: process.env.NOTION_TOKEN });
 
 export async function RetriveDatabase()  {
@@ -10,136 +24,177 @@ export async function RetriveDatabase()  {
 };
 
 
+const CreatePage = FormSchema;
+export async function fakecipher(title: any, tag: any, things: any) {
+  const cipher = AES.encrypt(title,String(process.env.KEY)).toString()
+  console.log(cipher)
+  console.log(AES.decrypt(cipher  ,String(process.env.KEY)).toString(enc.Utf8))
+ }
+export async function CreateApage(prevstate:State,formData:FormData) { 
+  
 
-
-export async function CreateApage({ title, tags ,things}: { title: string, tags:string[] ,things:child_block_data_type}) { 
-  const response = await notion.pages.create({
-    parent: {
-      database_id: process.env.DATABASE_ID
-    },
-    properties: {
-      [process.env.DATABASE_NAME_ID as string]: {
-        "id": "title",
-        "type": "title",
-        "title": [
-          {
-            "type": "text",
-            "text": {
-              "content": title,
-            }
-          }]
-      },
-      [process.env.DATABASE_TAGS_ID as string]: {
-        'multi_select': tags.map((tag) => ({ name: tag })) as {name:string}[]
-      },
-      
-      
-    },
-    children: [
-      {
-        "type": "heading_1",
-        "heading_1": {
-          "rich_text": [{
-            "type": "text",
-            "text": {
-              "content": "positive things",
-              "link": null
-            }
-          }],
-          "color"  :  "green_background"  as color,
-          "is_toggleable": false
-        }
-      },
-      {
-        
-        object: 'block',
-        type: 'paragraph',
-        paragraph: {
-          rich_text:[
-            {
-            "type": "text",
-            "text": {
-              "content": things.positive_things,
-              "link": null
-            },
-            "annotations": {
-              "color":"green" 
-            },
-            }] as rich_text_type
-        }
-      },
-      {
-        "type": "heading_1",
-        "heading_1": {
-          "rich_text": [{
-            "type": "text",
-            "text": {
-              "content":"negative things",
-              "link": null
-            }
-          }],
-          "color": "red_background" as color,
-          "is_toggleable": false
-        }
-      },
-      {
-        
-        object: 'block',
-        type: 'paragraph',
-        paragraph: {
-          rich_text:[
-            {
-            "type": "text",
-            "text": {
-              "content": things.negative_things,
-              "link": null
-            },
-            "annotations": {
-              "color":"red"
-
-            },
-          
-          
-            }] as rich_text_type
-        }
-      },{
-        "type": "heading_1",
-        "heading_1": {
-          "rich_text": [{
-            "type": "text",
-            "text": {
-              "content": "other",
-              "link": null
-            }
-          }],
-          "color": "blue" as color,
-          "is_toggleable": false
-        }
-      },
-      {
-        
-        object: 'block',
-        type: 'paragraph',
-        paragraph: {
-          rich_text:[
-            {
-            "type": "text",
-            "text": {
-              "content": things.other,
-              "link": null
-            },
-            "annotations": {
-              "color": "default" 
-            },
-          
-          
-            }] as rich_text_type
-        }
+    const parsedData = CreatePage.safeParse({
+      title: formData.get('title'),
+      tags: (formData.get('tags') as string).split(" "),
+      things: {
+        positive_things: formData.get('positive_things'),
+        negative_things: formData.get('negative_things'),
+        other_things: formData.get('title'),
       }
-    ]
-        })
-  console.log(response)
-  return response
+    
+    })
+    if (!parsedData.success) {
+      return {
+        errors: parsedData.error.flatten().fieldErrors,
+        message: 'Missing Fields. Failed to Create Invoice.',
+      };
+    }
+  const { title, tags, things } = parsedData.data;
+  // fakecipher(title, tags, things)
+
+  let response;
+  try {
+    response = await notion.pages.create({
+      parent: {
+        database_id: process.env.DATABASE_ID
+      },
+      properties: {
+        [process.env.DATABASE_NAME_ID as string]: {
+          "id": "title",
+          "type": "title",
+          "title": [
+            {
+              "type": "text",
+              "text": {
+                "content": AES.encrypt(title, String(process.env.KEY )).toString(),
+              }
+            }]
+        },
+        [process.env.DATABASE_TAGS_ID as string]: {
+          'multi_select': (tags as string[])?.length > 0 ? (tags as string[]).map((tag) => ({ name: tag })) as { name: string }[] : "no tags"
+        },
+      
+      
+      },
+      children: [
+        {
+          "type": "heading_1",
+          "heading_1": {
+            "rich_text": [{
+              "type": "text",
+              "text": {
+                "content": "positive things",
+                "link": null
+              }
+            }],
+            "color": "green_background" as color,
+            "is_toggleable": false
+          }
+        },
+        {
+        
+          object: 'block',
+          type: 'paragraph',
+          paragraph: {
+            rich_text: [
+              {
+                "type": "text",
+                "text": {
+                  "content": AES.encrypt(things?.positive_things,String(process.env.KEY)).toString(),
+                  "link": null
+                },
+                "annotations": {
+                  "color": "green"
+                },
+              }] as rich_text_type
+          }
+        },
+        {
+          "type": "heading_1",
+          "heading_1": {
+            "rich_text": [{
+              "type": "text",
+              "text": {
+                "content": "negative things",
+                "link": null
+              }
+            }],
+            "color": "red_background" as color,
+            "is_toggleable": false
+          }
+        },
+        {
+        
+          object: 'block',
+          type: 'paragraph',
+          paragraph: {
+            rich_text: [
+              {
+                "type": "text",
+                "text": {
+                  "content": AES.encrypt(things?.negative_things,String(process.env.KEY)).toString(),
+                  "link": null
+                },
+                "annotations": {
+                  "color": "red"
+
+                },
+          
+          
+              }] as rich_text_type
+          }
+        }, {
+          "type": "heading_1",
+          "heading_1": {
+            "rich_text": [{
+              "type": "text",
+              "text": {
+                "content": "other",
+                "link": null
+              }
+            }],
+            "color": "blue" as color,
+            "is_toggleable": false
+          }
+        },
+        {
+        
+          object: 'block',
+          type: 'paragraph',
+          paragraph: {
+            rich_text: [
+              {
+                "type": "text",
+                "text": {
+                  "content": AES.encrypt(things?.other_things,String(process.env.KEY)).toString(),
+                  "link": null
+                },
+                "annotations": {
+                  "color": "default"
+                },
+          
+          
+              }] as rich_text_type
+          }
+        }
+      ]
+    })
+    
+    
+
+  }
+  // console.log(response.status)
+  catch (e: any) { 
+    // console.log(e)
+    return {
+      
+      message:"journal created err"+String(e.message)
+    }
+  }
+  
+  revalidatePath('/journals')
+  redirect('/journals?message=' + encodeURIComponent("journal created suc"))
+  // return response
 }
 function GetTags(result:any) { 
   const Tags = result.properties.Tags.multi_select.map((tag: any) => {
@@ -151,6 +206,7 @@ function GetTags(result:any) {
 }
 
 function Getimportant(results: any) {
+  // console.log(results)
   const pure_results = results.map((result: any) => { 
     return {
       id: result.id,
@@ -167,7 +223,8 @@ function Getimportant(results: any) {
 
 export async function RetrievePages() { 
  
-
+  try {
+    
     const res = await notion.databases.query({
       database_id: process.env.DATABASE_ID,
       sorts: [
@@ -177,8 +234,12 @@ export async function RetrievePages() {
         }
       ]
     })
+    // console.log(res)
+    const data = Getimportant(res.results)
+    return (data);
+  } catch (e){ 
+    console.log(String(e))
+  }
   
-    console.log(Getimportant(res.results))
-    
 }
 

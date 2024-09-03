@@ -1,3 +1,6 @@
+import { Cipher } from "crypto";
+import { CipherParams } from "crypto-ts/src/lib/CipherParams";
+
 export type Tag = "Daily" | "Special Event" | "Work" | "Personal" | "Planing" | string
 null
       
@@ -29,7 +32,7 @@ export type rich_text_type =   [
     {
     "type": "text",
     "text": {
-      "content": string,
+      "content": string|CipherParams,
       "link"?: null|string
     },
     "annotations"?: {
@@ -48,4 +51,13 @@ export type rich_text_type =   [
         negative_things: string|null,
         positive_things: string|null, 
         other:string|null 
-    }
+}
+    
+export type State = {
+  errors?: {
+    title?: string[];
+    tags?: string[];
+    things?: string[];
+  };
+  message?: string | null;
+};
