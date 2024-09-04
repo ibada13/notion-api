@@ -35,7 +35,7 @@ export async function CreateApage(prevstate:State,formData:FormData) {
 
     const parsedData = CreatePage.safeParse({
       title: formData.get('title'),
-      tags: (formData.get('tags') as string).split(" "),
+      tags: (formData.get('tags') as string).split(" ").filter(Boolean),
       things: {
         positive_things: formData.get('positive_things'),
         negative_things: formData.get('negative_things'),
@@ -71,7 +71,7 @@ export async function CreateApage(prevstate:State,formData:FormData) {
             }]
         },
         [process.env.DATABASE_TAGS_ID as string]: {
-          'multi_select': (tags as string[])?.length > 0 ? (tags as string[]).map((tag) => ({ name: tag })) as { name: string }[] : "no tags"
+          'multi_select': (tags as string[])?.length > 0 ? (tags as string[]).map((tag) => ({ name: tag })) as { name: string }[] : ["no tags"]
         },
       
       
@@ -234,20 +234,18 @@ export async function RetrievePages() {
         }
       ]
     })
-    // console.log(res)
+    // console.log(res.results[0].properties)
     const data = Getimportant(res.results)
+    console.log(data)
     return (data);
   } catch (e){ 
     console.log(String(e))
   }
   
 }
-function decrypt(title: string) { 
-  const data = AES.decrypt(title, String(process.env.KEY)).toString(enc.Utf8);
-  return data;
- }
+
 export async function gen_RetrievePages() { 
-  var data = await RetrievePages()
+  const data = await RetrievePages()
   const puredata = data.map((e: any) => { 
       return {
         ...e,
@@ -259,8 +257,46 @@ export async function gen_RetrievePages() {
 }
 
 export async function Retrieveblock(blockId:string) { 
-  const response = await notion.blocks.retrieve({
+  // const response = await notion.blocks.retrieve({
+  //   block_id: blockId,
+  // });
+  // // console.log(response)
+  return Retrieveblockchildrens(blockId)
+}
+export async function Retrieveblockchildrens(blockId: string) {
+  const response = await notion.blocks.children.list({
     block_id: blockId,
+    page_size: 200,
   });
-  console.log(response)
+  const data = process_blocks_data(response.results);
+  console.log(data)
+  return data; 
+ }
+    function process_blocks_data(blocks: any) {
+      const pureblocks = blocks.map((block: any) => { 
+        if (block.type === "heading_1") {
+
+          return {
+            content: block.heading_1.rich_text[0].plain_text,
+          }
+        }
+        else { 
+          return {
+            content:block.paragraph.rich_text[0].plain_text
+          }
+        }
+      })
+      const orgnizeddata = pureblocks.map((block:any, index:any, arr:any) => { 
+        if (index % 2 == 0) { 
+          return {
+            heading: block.content,
+            heading_class: index == 0 ? "bg-green-500" : index == 2 ? "bg-red-500" : "bg-blue-500",
+            paragraph:AES.decrypt(String(arr[index + 1].content) , String(process.env.KEY)).toString(enc.Utf8),
+            paragraph_class: index == 0 ? "text-green-500" : index == 2 ? "text-red-500" : "text-white",
+
+          }
+          
+        }
+      }).filter(Boolean)
+      return orgnizeddata;
 }

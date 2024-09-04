@@ -15,8 +15,6 @@ const searchParams = useSearchParams();
     const fetchData = async () => {
         try {
             var data = await gen_RetrievePages();
-           
-            console.log(data)
             setPages(data);
         } catch (error) {
             console.error("Failed to fetch pages:", error);
@@ -41,7 +39,7 @@ const searchParams = useSearchParams();
         <h1 className="text-red-500 text-center text-6xl mb-5">this all the journals you have</h1>
         <div className="flex flex-col  h-screen items-center">
                 {Pages.map((e:any, i:any) => (
-                    <a className="w-4/5 min-h-32 text-center border border-white  m-2 rounded-xl flex "> 
+                    <a href={"/journals/"+e.id} className="w-4/5 min-h-32 text-center border border-white  m-2 rounded-xl flex "> 
                     <div className="flex flex-col flex-grow">
                         
                 <div className="h-2/6 flex justify-center items-center ">
