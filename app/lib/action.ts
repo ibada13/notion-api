@@ -25,6 +25,8 @@ export async function RetriveDatabase()  {
 
 
 const CreatePage = FormSchema;
+
+
 export async function fakecipher(title: any) {
   const cipher = AES.encrypt(title,String(process.env.KEY)).toString()
   console.log(cipher)
@@ -39,7 +41,7 @@ export async function CreateApage(prevstate:State,formData:FormData) {
       things: {
         positive_things: formData.get('positive_things'),
         negative_things: formData.get('negative_things'),
-        other_things: formData.get('title'),
+        other_things: formData.get('other_things'),
       }
     
     })
@@ -71,7 +73,7 @@ export async function CreateApage(prevstate:State,formData:FormData) {
             }]
         },
         [process.env.DATABASE_TAGS_ID as string]: {
-          'multi_select': (tags as string[])?.length > 0 ? (tags as string[]).map((tag) => ({ name: tag })) as { name: string }[] : ["no tags"]
+          'multi_select': (tags as string[])?.length > 0 ? (tags as string[]).map((tag) => ({ name: tag })) as { name: string }[] : [{name:"no tags"}]
         },
       
       
@@ -236,7 +238,7 @@ export async function RetrievePages() {
     })
     // console.log(res.results[0].properties)
     const data = Getimportant(res.results)
-    console.log(data)
+    // console.log(data)
     return (data);
   } catch (e){ 
     console.log(String(e))
@@ -247,10 +249,23 @@ export async function RetrievePages() {
 export async function gen_RetrievePages() { 
   const data = await RetrievePages()
   const puredata = data.map((e: any) => { 
+    try {
+
+      const title = AES.decrypt(String(e["title"]), String(process.env.KEY)).toString(enc.Utf8)
+      if (!title) {
+        throw new Error('Decryption resulted in null or empty string');
+      }
       return {
         ...e,
-          "title":AES.decrypt(String(e["title"] ) ,String(process.env.KEY)).toString(enc.Utf8),
-        }
+        "title": title,
+      }
+    }
+    catch (err) { 
+      console.log("some error" + err)
+      return {
+        ...e,
+      }
+    }
 }
   )
   return puredata
@@ -268,8 +283,8 @@ export async function Retrieveblockchildrens(blockId: string) {
     block_id: blockId,
     page_size: 200,
   });
+  // console.log(response.results[5].paragraph)
   const data = process_blocks_data(response.results);
-  console.log(data)
   return data; 
  }
     function process_blocks_data(blocks: any) {
@@ -286,17 +301,35 @@ export async function Retrieveblockchildrens(blockId: string) {
           }
         }
       })
+      console.log(pureblocks)
       const orgnizeddata = pureblocks.map((block:any, index:any, arr:any) => { 
-        if (index % 2 == 0) { 
-          return {
-            heading: block.content,
-            heading_class: index == 0 ? "bg-green-500" : index == 2 ? "bg-red-500" : "bg-blue-500",
-            paragraph:AES.decrypt(String(arr[index + 1].content) , String(process.env.KEY)).toString(enc.Utf8),
-            paragraph_class: index == 0 ? "text-green-500" : index == 2 ? "text-red-500" : "text-white",
+        if (index % 2 == 0 && arr[index + 1]) { 
+          try {
 
+
+            const encryptedParagraph = String(arr[index + 1].content);
+            
+            const decryptedParagraph = AES.decrypt(encryptedParagraph, String(process.env.KEY)).toString(enc.Utf8);
+            
+            return {
+              heading: block.content,
+              heading_class: index == 0 ? "bg-green-500" : index == 2 ? "bg-red-500" : "bg-blue-500",
+              paragraph: decryptedParagraph,
+              paragraph_class: index == 0 ? "text-green-500" : index == 2 ? "text-red-500" : "text-white",
+              
+            }
+          } catch (err) { 
+              return {
+              heading: block.content,
+              heading_class: index == 0 ? "bg-green-500" : index == 2 ? "bg-red-500" : "bg-blue-500",
+              paragraph: String(arr[index+1]),
+              paragraph_class: index == 0 ? "text-green-500" : index == 2 ? "text-red-500" : "text-white",
+              
+            }
           }
           
         }
       }).filter(Boolean)
+      console.log(orgnizeddata)
       return orgnizeddata;
 }

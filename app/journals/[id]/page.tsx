@@ -8,6 +8,7 @@ export default function Journal() {
     const {id} = useParams();
     const [block , SetBlock ] = useState([])
     const [Loading , SetLoading] = useState(true)
+
     useEffect(() => {
         if (id) {
 
@@ -26,6 +27,7 @@ export default function Journal() {
             fetch_data();
         }
     }, [id]);
+
     if (Loading) { 
         return (
             <p>loading .....</p>

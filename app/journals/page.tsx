@@ -25,6 +25,13 @@ const searchParams = useSearchParams();
 
       fetchData();
   }, []);
+    
+  async function TrashApagehelper(e:React.MouseEvent<HTMLButtonElement>) { 
+        e.preventDefault()
+        const id = e.currentTarget.getAttribute('data-id');
+        console.log(id)
+  } 
+
     if (Loading) {
         return (
             <p>laoding ..........</p>
@@ -59,9 +66,9 @@ const searchParams = useSearchParams();
                     </div>
                     <div className="w-[10%] flex flex-col">
                         <div className="flex-grow  flex items-center justify-center">
-                                <a href="" className="flex items-center justify-center">
+                                <button onClick={TrashApagehelper} data-id={e.id} className="flex items-center justify-center">
                             <CiPen  size={"40%"} className="text-white transition-all hover:size-1/2 hover:text-red-500 "/>
-                                </a>
+                                </button>
                         </div>
                             <div className="flex-grow  flex items-center justify-center">
                                 <a href="http://" className="flex items-center justify-center">
