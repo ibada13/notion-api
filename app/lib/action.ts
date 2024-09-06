@@ -261,7 +261,7 @@ export async function gen_RetrievePages() {
       }
     }
     catch (err) { 
-      console.log("some error" + err)
+      // console.log("some error" +  err)
       return {
         ...e,
       }
@@ -332,4 +332,21 @@ export async function Retrieveblockchildrens(blockId: string) {
       }).filter(Boolean)
       console.log(orgnizeddata)
       return orgnizeddata;
+}
+
+
+export async function TrashaApage(pageId:string) { 
+  try {
+
+    const response = await notion.pages.update({
+      page_id: pageId,
+      in_trash: true
+    });
+    revalidatePath('/test');
+    console.log(response)
+    return { message: 'Deleted Invoice' };
+  } catch (err) { 
+    console.log("some error ocurred : " +err )
+  }
+  
 }

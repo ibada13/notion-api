@@ -6,6 +6,7 @@ import { CiPen } from "react-icons/ci";
 import { FaRegTrashCan } from "react-icons/fa6";
 import { BiTrash } from "react-icons/bi";
 import { AES,enc } from "crypto-ts";
+import { TrashJournal } from "../ui/buttons";
 export default  function Journals() { 
 const searchParams = useSearchParams();
   const message = searchParams.get('message');
@@ -70,11 +71,7 @@ const searchParams = useSearchParams();
                             <CiPen  size={"40%"} className="text-white transition-all hover:size-1/2 hover:text-red-500 "/>
                                 </button>
                         </div>
-                            <div className="flex-grow  flex items-center justify-center">
-                                <a href="http://" className="flex items-center justify-center">
-                            <FaRegTrashCan size={"30%"} className="text-white transition-all hover:size-2/5 hover:text-red-500 "  />
-                                </a>
-                        </div>
+                            <TrashJournal id={e.id} />
                     </div>
             </a>
                 )) }
