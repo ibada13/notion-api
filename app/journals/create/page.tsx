@@ -1,13 +1,37 @@
 'use client';
-import { RetriveDatabase ,CreateApage, RetrievePages} from "@/app/lib/action";
+import { RetriveDatabase ,CreateApage, Retrieveblockchildrens} from "@/app/lib/action";
 import { State } from "@/app/lib/definitions";
-import { useActionState } from "react";
-import { useFormState } from "react-dom";
-
+import { useParams, useSearchParams } from "next/navigation";
+import { useActionState, useState } from "react";
+import { useEffect } from "react";
 export default function CreateJournal() { 
     // RetrievePages()
+    const searchParams = useSearchParams();
+    const {id} = useParams()
     const initialState: State = { message: null, errors: {} };
-    const [state, formAction] = useActionState(CreateApage, initialState);
+    const [state, formAction] = useActionState(CreateApage , initialState);
+    const [Data, SetData] = useState();
+    const [Loading, SetLoading] = useState(true);
+    useEffect(() => {
+        if (id) {
+
+            const fetch_data = async () => { 
+                try {
+                    const data = await Retrieveblockchildrens(String(id));
+                    SetData(data);
+                }
+                catch (e) {
+                    console.log("aw ow some error occurred" + e)
+                }
+                finally { 
+                    SetLoading(false)
+                }
+            }
+            fetch_data();
+        }
+    }, [id]);
+
+
     return (
         <div className=" w-full h-full flex justify-center pt-5 ">
             

@@ -1,23 +1,29 @@
 'use client';
 import { useSearchParams } from "next/navigation";
-import { gen_RetrievePages, RetrievePages } from "../lib/action";
+import {  RetrievePages } from "../lib/action";
 import { useEffect, useState } from "react";
 import { CiPen } from "react-icons/ci";
 import { FaRegTrashCan } from "react-icons/fa6";
 import { BiTrash } from "react-icons/bi";
 import { AES,enc } from "crypto-ts";
 import { TrashJournal } from "../ui/buttons";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 export default  function Journals() { 
-const searchParams = useSearchParams();
-  const message = searchParams.get('message');
-  const [Pages,setPages] =useState([])
-  const [Loading , setLoading] = useState<boolean>(true)
-  const { data, error, isLoading } = useSWR('journals-key', gen_RetrievePages);
+    const searchParams = useSearchParams();
+    const message = searchParams.get('message');
+    const [Pages,setPages] =useState([])
+    const [Loading , setLoading] = useState<boolean>(true)
+    const { data, error, isLoading } = useSWR('journals-key', RetrievePages);
+    const [Error, SetError] = useState();
+    const [Delete, SetDelete] = useState<String | null >(null);
 
   useEffect(() => {
       if (data) { 
-          setPages(data)
+          setPages(data);
+          mutate('journals-key');
+      }
+      if (error) { 
+          SetError(error);
       }
   }, [data]);
     
@@ -34,13 +40,17 @@ const searchParams = useSearchParams();
      } else { 
 
         return (<div className="h-screen">
-
+            {message ?
         <h1 className=" block text-center text-4xl bg-green-400 w-1/2 h-2/6 pt-8 pb-8   mr-auto ml-auto mb-6  mt-6 shadow-2xl">
             journal created suc
         </h1>
+            : null}
         <h1 className="text-red-500 text-center text-6xl mb-5">this all the journals you have</h1>
         <div className="flex flex-col  h-screen items-center">
+            {  Delete ? <>{Delete}</>:null} 
                 {Pages.map((e:any, i:any) => (
+                    <div className="w-full flex  justify-center">
+
                     <a href={"/journals/"+e.id} className="w-4/5 min-h-32 text-center border border-white  m-2 rounded-xl flex "> 
                     <div className="flex flex-col flex-grow">
                         
@@ -65,9 +75,10 @@ const searchParams = useSearchParams();
                             <CiPen  size={"40%"} className="text-white transition-all hover:size-1/2 hover:text-red-500 "/>
                                 </button>
                         </div>
-                            <TrashJournal id={e.id} />
+                            <TrashJournal  setdelete={SetDelete} id={e.id} />
                     </div>
             </a>
+        </div>
                 )) }
         <div className="w-4/5 min-h-48 text-center bg-red-400  m-2 rounded-md flex "> 
                 <div className="flex flex-col flex-grow">
