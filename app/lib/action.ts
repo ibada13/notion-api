@@ -224,8 +224,9 @@ export async function Retrieveblockchildrens(blockId: string) {
     block_id: blockId,
     page_size: 200,
   });
-  // console.log(response.results[5].paragraph)
+  
   const data = process_blocks_data(response.results);
+  
   return data; 
  }
 
@@ -237,7 +238,6 @@ export async function TrashaApage(pageId:string) {
       page_id: pageId,
       in_trash: true
     });
-    // revalidatePath('/journals');
     revalidatePath("/journals")
   } catch (err) { 
     console.log("some error ocurred : " +err )
