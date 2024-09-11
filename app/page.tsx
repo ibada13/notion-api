@@ -1,4 +1,4 @@
-import { genratekey } from "./lib/fakeactions";
+import { genratekey } from "./extralib/fakeactions";
 export default function Home  ()  { 
   genratekey()
   return (

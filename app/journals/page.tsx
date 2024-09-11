@@ -15,7 +15,7 @@ export default  function Journals() {
     const [Loading , setLoading] = useState<boolean>(true)
     const { data, error, isLoading } = useSWR('journals-key', RetrievePages);
     const [Error, SetError] = useState();
-    const [Delete, SetDelete] = useState<String | null >(null);
+    const [Delete, SetDelete] = useState<{details:String  , class:string} | null>(null);
 
   useEffect(() => {
       if (data) { 
@@ -47,7 +47,9 @@ export default  function Journals() {
             : null}
         <h1 className="text-red-500 text-center text-6xl mb-5">this all the journals you have</h1>
         <div className="flex flex-col  h-screen items-center">
-            {  Delete ? <>{Delete}</>:null} 
+                {Delete ?
+                    <p className={" fixed bottom-0 right-0 p-1 m-5 flex justify-center items-center w-1/4 h-1/5 " + Delete.class}>{ Delete.details}</p>
+                    : null} 
                 {Pages.map((e:any, i:any) => (
                     <div className="w-full flex  justify-center">
 

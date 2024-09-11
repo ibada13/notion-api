@@ -2,12 +2,13 @@ import { FaRegTrashCan } from "react-icons/fa6";
 import { TrashaApage } from "@/app/lib/action";
 import { mutate } from "swr";
 import { Dispatch, SetStateAction, useState } from "react";
-export function TrashJournal({ id, setdelete }: { id: string, setdelete: Dispatch<SetStateAction<String|null>> }) {
+export function TrashJournal({ id, setdelete }: { id: string, setdelete: Dispatch<SetStateAction<{details:String , class:string}|null>> }) {
     const [loading, setLoading] = useState(false);
 
   const Trashaction = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setdelete("Deleting ......");
+    setdelete({details:"deleting .... " , class:"bg-red-500"})
+
     // Optimistically update the UI
     mutate('journals-key', (currentData: any) => {
       return currentData.filter((item: any) => item.id !== id);
@@ -17,12 +18,12 @@ export function TrashJournal({ id, setdelete }: { id: string, setdelete: Dispatc
       await TrashaApage(id);  // Perform the delete operation
       // Optionally, revalidate the cache to ensure the data is up-to-date
       mutate('journals-key');
-      setdelete("deleted succesfully .")
+      setdelete({details:"deleted succesfully ." , class:"bg-green-500"})
     } catch (err) {
       console.error('Error trashing journal:', err);
       // Rollback optimistic update in case of error
       mutate('journals-key');  // Re-fetch the data to restore the original state
-      setdelete("delted unsuceuflly .")
+      setdelete({details:"delted unsuceuflly .",class:"bg-pink-500"})
     } finally { 
       setTimeout(() => { 
         setdelete(null);
