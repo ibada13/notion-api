@@ -338,12 +338,15 @@ export async function Retrieveblockchildrens(blockId: string) {
 export async function TrashaApage(pageId:string) { 
   try {
 
-    const response = await notion.pages.update({
+     await notion.pages.update({
       page_id: pageId,
       in_trash: true
     });
-    revalidatePath('/test');
-    console.log(response)
+    // revalidatePath('/journals');
+    return {
+      props: {},
+      revalidate: 60, // Revalidates every 60 seconds
+    };
     return { message: 'Deleted Invoice' };
   } catch (err) { 
     console.log("some error ocurred : " +err )

@@ -7,33 +7,27 @@ import { FaRegTrashCan } from "react-icons/fa6";
 import { BiTrash } from "react-icons/bi";
 import { AES,enc } from "crypto-ts";
 import { TrashJournal } from "../ui/buttons";
+import useSWR from "swr";
 export default  function Journals() { 
 const searchParams = useSearchParams();
   const message = searchParams.get('message');
   const [Pages,setPages] =useState([])
   const [Loading , setLoading] = useState<boolean>(true)
+  const { data, error, isLoading } = useSWR('journals-key', gen_RetrievePages);
+
   useEffect(() => {
-    const fetchData = async () => {
-        try {
-            var data = await gen_RetrievePages();
-            setPages(data);
-        } catch (error) {
-            console.error("Failed to fetch pages:", error);
-        } finally { 
-            setLoading(false)
-        }
-    };
-
-      fetchData();
-  }, []);
+      if (data) { 
+          setPages(data)
+      }
+  }, [data]);
     
-  async function TrashApagehelper(e:React.MouseEvent<HTMLButtonElement>) { 
-        e.preventDefault()
-        const id = e.currentTarget.getAttribute('data-id');
-        console.log(id)
-  } 
+//   async function TrashApagehelper(e:React.MouseEvent<HTMLButtonElement>) { 
+//         e.preventDefault()
+//         const id = e.currentTarget.getAttribute('data-id');
+//         console.log(id)
+//   } 
 
-    if (Loading) {
+    if (isLoading) {
         return (
             <p>laoding ..........</p>
         );
@@ -67,7 +61,7 @@ const searchParams = useSearchParams();
                     </div>
                     <div className="w-[10%] flex flex-col">
                         <div className="flex-grow  flex items-center justify-center">
-                                <button onClick={TrashApagehelper} data-id={e.id} className="flex items-center justify-center">
+                                <button  data-id={e.id} className="flex items-center justify-center">
                             <CiPen  size={"40%"} className="text-white transition-all hover:size-1/2 hover:text-red-500 "/>
                                 </button>
                         </div>

@@ -8,7 +8,7 @@ export default function Journal() {
     const {id} = useParams();
     const [block , SetBlock ] = useState([])
     const [Loading , SetLoading] = useState(true)
-
+    const [error , SetError] = useState(false)
     useEffect(() => {
         if (id) {
 
