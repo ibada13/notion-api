@@ -2,8 +2,8 @@ import { FaRegTrashCan } from "react-icons/fa6";
 import { TrashaApage } from "@/app/lib/action";
 import { mutate } from "swr";
 import { Dispatch, SetStateAction, useState } from "react";
+import { CiPen } from "react-icons/ci";
 export function TrashJournal({ id, setdelete }: { id: string, setdelete: Dispatch<SetStateAction<{details:String , class:string}|null>> }) {
-    const [loading, setLoading] = useState(false);
 
   const Trashaction = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -35,9 +35,17 @@ export function TrashJournal({ id, setdelete }: { id: string, setdelete: Dispatc
         <form onSubmit={Trashaction} className="flex-grow  flex items-center justify-center">
           
         <button type="submit" className="bg-red-500 flex justify-center ">
-        {loading ? <span>Loading...</span> : <FaRegTrashCan size={"30%"} className="text-white transition-all hover:size-2/5 hover:text-red-500" />}
-
+        <FaRegTrashCan size={"30%"} className="text-white transition-all hover:size-2/5 hover:text-red-500" />
         </button>
         </form>
     );
+}
+ 
+export function EditJournal({ id }: { id: string }) {
+
+  return (
+    <a href={"/journals/edit/"  + id} className="flex-grow  flex items-center justify-center">
+      <CiPen  size={"40%"} className="text-white transition-all hover:size-1/2 hover:text-red-500 "/>
+    </a>
+  );
  }
