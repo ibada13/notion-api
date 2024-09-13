@@ -6,17 +6,8 @@ import {z, ZodError} from 'zod';
 import { revalidatePath } from "next/cache";
 import { AES, enc, lib } from "crypto-ts";
 import { Getimportant ,process_blocks_data,gen_RetrievePages} from "./extraactions";
-import { get_data } from "./function_data";
-const FormSchema = z.object({
-    title: z.string(), 
-  tags: z.array(z.string()),
-   things:z.object( {
-    positive_things:z.string() ,
-    negative_things:z.string() ,
-    other_things:z.string() ,
-  })
+import { get_data, safe_data } from "./function_data";
 
-});
 const notion = new Client({ auth: process.env.NOTION_TOKEN });
 
 export async function RetriveDatabase()  {
@@ -26,23 +17,14 @@ export async function RetriveDatabase()  {
 };
 
 
-const CreatePage = FormSchema;
+
 
 
 
 export async function CreateApage(prevstate:State,formData:FormData) { 
   
-
-    const parsedData = CreatePage.safeParse({
-      title: formData.get('title'),
-      tags: (formData.get('tags') as string).split(" ").filter(Boolean),
-      things: {
-        positive_things: formData.get('positive_things'),
-        negative_things: formData.get('negative_things'),
-        other_things: formData.get('other_things'),
-      }
+  const parsedData = safe_data(formData);
     
-    })
     if (!parsedData.success) {
       return {
         errors: parsedData.error.flatten().fieldErrors,
@@ -130,6 +112,23 @@ export async function TrashaApage(pageId:string) {
   
 }
 
-export async function update_journal(prev: State, formData: FormData) { 
-  return {}
+export async function update_journal( blockId:string,formData: FormData):Promise<State | undefined> { 
+  console.log(formData)
+  const parsedData = safe_data(formData);
+  if (!parsedData.success) { 
+    return {
+      errors: parsedData.error.flatten().fieldErrors,
+      message: 'Missing Fields. Failed to Create Invoice.',
+    };
+  }
+  const { title, tags, things } = parsedData.data;
+  const data = get_data({ title, tags, things }); 
+    const response = await notion.blocks.children.append({
+      block_id: blockId,
+      children:data.children
+      
+    });
+  console.log(response);
+  return response;
+  
 }

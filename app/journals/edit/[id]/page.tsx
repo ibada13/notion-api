@@ -12,8 +12,7 @@ export default function Edit_Journal() {
     const [Journal, SetJournal] = useState();
     const things_headers :string[]=["positive_things" , "negative_things" , "other_things"]
     const initialState: State = { message: null, errors: {} };
-
-    const formAction = useActionState(update_journal , initialState)
+    const formAction = update_journal.bind(null,id as string)
     useEffect(() => { 
         const get_journal_childs = async () => {
             if (id) { 

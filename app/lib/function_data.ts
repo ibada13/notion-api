@@ -1,5 +1,6 @@
 import { AES } from "crypto-ts"
 import { color, rich_text_type } from "./definitions"
+import { z } from "zod";
 
 
 
@@ -128,4 +129,31 @@ export function get_data({ title, tags, things }: { title: string, tags: string[
       }
     ]
   }
+}
+
+
+const FormSchema = z.object({
+  title: z.string(), 
+tags: z.array(z.string()),
+ things:z.object( {
+  positive_things:z.string() ,
+  negative_things:z.string() ,
+  other_things:z.string() ,
+})
+
+});
+const CreatePage = FormSchema;
+
+export function safe_data(formData:FormData) { 
+  const parsedData = CreatePage.safeParse({
+    title: formData.get('title'),
+    tags: (formData.get('tags') as string).split(" ").filter(Boolean),
+    things: {
+      positive_things: formData.get('positive_things'),
+      negative_things: formData.get('negative_things'),
+      other_things: formData.get('other_things'),
+    }
+  
+  })
+  return parsedData; 
 }
