@@ -29,7 +29,7 @@ export function Getimportant(results: any) {
         id: result.id,
         created_time :result.created_time , 
         updated_time : result.last_edited_time,
-        [result.properties.Name.id]:result.properties.Name.title[0].plain_text,
+        [result.properties.Name.id]:result.properties.Name.title[0]?.plain_text,
         [result.properties.Tags.id]:GetTags(result)
       }
     })
@@ -42,12 +42,12 @@ export function process_blocks_data(blocks: any) {
       if (block.type === "heading_1") {
 
         return {
-          content: block.heading_1.rich_text[0].plain_text,
+          content: block.heading_1.rich_text[0]?.plain_text,
         }
       }
       else { 
         return {
-          content:block.paragraph.rich_text[0].plain_text
+          content:block.paragraph.rich_text[0]?.plain_text
         }
       }
     })

@@ -53,12 +53,14 @@ export async function CreateApage(prevstate:State,formData:FormData) {
     const { title, tags, things } = parsedData.data;
     
     try {
-    const data = get_data({title, tags, things})
+      const data = get_data({ title, tags, things })
+      console.log(data.children[1].paragraph?.rich_text[0].text)
   const response = await notion.pages.create({
       parent: {
         database_id: process.env.DATABASE_ID
     },
-    properties:data.properties
+    properties: data.properties,
+    children : data.children
     })
     
     

@@ -7,9 +7,17 @@ export default function Edit_Journal() {
     const [Loading, SetLoading] = useState<boolean>(true);
     const [Error, SetError] = useState<boolean>(false);
     useEffect(() => { 
-        const get_journal_childs=async()=>{if (id) { 
-           await Retrieveblockchildrens(id as string);
-        }
+        const get_journal_childs = async () => {
+            if (id) { 
+                try {
+
+                    await Retrieveblockchildrens(id as string);
+                } catch (e) {
+                    SetError(true)
+                } finally { 
+                    SetLoading(false)
+                }
+                }
         }
         get_journal_childs()
     },[])

@@ -1,7 +1,7 @@
 'use client';
 import { RetriveDatabase ,CreateApage, Retrieveblockchildrens} from "@/app/lib/action";
 import { State } from "@/app/lib/definitions";
-import { Form } from "@/app/ui/journals/create-form";
+import  Form from "@/app/ui/journals/create-form";
 import { useParams, useSearchParams } from "next/navigation";
 import { useActionState, useState } from "react";
 import { useEffect } from "react";
