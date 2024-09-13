@@ -129,3 +129,7 @@ export async function TrashaApage(pageId:string) {
   }
   
 }
+
+export async function update_journal(prev: State, formData: FormData) { 
+  return {}
+}
