@@ -131,19 +131,21 @@ export async function update_journal( blockId:string,Ids:string[],formData: Form
   // });
   try {
     
-    const response =data.children.map(async(e, i) => { 
+    const response =data.children.map((e, i) => { 
       console.log(Ids[i])
       if (e.type === "paragraph") { 
-        
-        const response = await notion.blocks.update({
-          "block_id": Ids[i%3],
-          "paragraph":e.paragraph
-        })
-        return response;
+        setTimeout(async() => { 
+
+          const response = await notion.blocks.update({
+            "block_id": Ids[i%3],
+            "paragraph":e.paragraph
+          })
+          return response;
+        },3000*i%3)
       }
     }
     )
-    // console.log(response);
+    console.log(response);
   } catch (e) { 
     console.log(e)
   }
