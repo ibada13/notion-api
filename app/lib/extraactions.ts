@@ -47,6 +47,7 @@ export function process_blocks_data(blocks: any) {
       }
       else { 
         return {
+          id:block.id,
           content:block.paragraph.rich_text[0]?.plain_text
         }
       }
@@ -62,6 +63,7 @@ export function process_blocks_data(blocks: any) {
           const decryptedParagraph = AES.decrypt(encryptedParagraph, String(process.env.KEY)).toString(enc.Utf8);
           
           return {
+            id:arr[index+1].id , 
             heading: block.content,
             heading_class: index == 0 ? "bg-green-500" : index == 2 ? "bg-red-500" : "bg-blue-500",
             paragraph: decryptedParagraph,
@@ -69,7 +71,9 @@ export function process_blocks_data(blocks: any) {
             
           }
         } catch (err) { 
-            return {
+          return {
+              
+            id:arr[index+1].id , 
             heading: block.content,
             heading_class: index == 0 ? "bg-green-500" : index == 2 ? "bg-red-500" : "bg-blue-500",
             paragraph: String(arr[index+1]),

@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 import { AES, enc, lib } from "crypto-ts";
 import { Getimportant ,process_blocks_data,gen_RetrievePages} from "./extraactions";
 import { get_data, safe_data } from "./function_data";
+import { error } from "console";
 
 const notion = new Client({ auth: process.env.NOTION_TOKEN });
 
@@ -112,7 +113,7 @@ export async function TrashaApage(pageId:string) {
   
 }
 
-export async function update_journal( blockId:string,formData: FormData):Promise<State | undefined> { 
+export async function update_journal( blockId:string,Ids:string[],formData: FormData):Promise<State | undefined> { 
   console.log(formData)
   const parsedData = safe_data(formData);
   if (!parsedData.success) { 
@@ -123,12 +124,28 @@ export async function update_journal( blockId:string,formData: FormData):Promise
   }
   const { title, tags, things } = parsedData.data;
   const data = get_data({ title, tags, things }); 
-    const response = await notion.blocks.children.append({
-      block_id: blockId,
-      children:data.children
+    // const response = await notion.blocks.children.append({
+    //   block_id: blockId,
+    //   children:data.children
       
-    });
-  console.log(response);
-  return response;
+  // });
+  try {
+    
+    const response =data.children.map(async(e, i) => { 
+      console.log(Ids[i])
+      if (e.type === "paragraph") { 
+        
+        const response = await notion.blocks.update({
+          "block_id": Ids[i%3],
+          "paragraph":e.paragraph
+        })
+        return response;
+      }
+    }
+    )
+    // console.log(response);
+  } catch (e) { 
+    console.log(e)
+  }
   
 }
