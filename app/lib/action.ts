@@ -92,9 +92,9 @@ export async function Retrieveblockchildrens(blockId: string) {
     block_id: blockId,
     page_size: 200,
   });
-  console.log(response)
+  // console.log(response)
   const data = process_blocks_data(response.results);
-  
+  console.log(data)
   return data; 
  }
 
@@ -113,7 +113,8 @@ export async function TrashaApage(pageId:string) {
   
 }
 
-export async function update_journal( blockId:string,Ids:string[],formData: FormData):Promise<State | undefined> { 
+export async function update_journal( blockId:string,Ids:{[key:string]:string},formData: FormData):Promise<State | undefined> { 
+  var acc: number = 0; 
   console.log(formData)
   const parsedData = safe_data(formData);
   if (!parsedData.success) { 
@@ -130,24 +131,40 @@ export async function update_journal( blockId:string,Ids:string[],formData: Form
       
   // });
   try {
-    
-    const response =data.children.map((e, i) => { 
-      console.log(Ids[i])
-      if (e.type === "paragraph") { 
-        setTimeout(async() => { 
-
-          const response = await notion.blocks.update({
-            "block_id": Ids[i%3],
-            "paragraph":e.paragraph
-          })
-          return response;
-        },3000*i%3)
+    // Using Promise.all to handle all the async requests
+    const responsePromises = data.children.map((e, i) => {
+      if (e.type === "paragraph") {
+        const idToUse = Ids[acc];
+        console.log(Ids[acc])// Cycle through the 3 elements of Ids
+        acc++;
+        return new Promise((resolve) => {
+          setTimeout(async () => {
+            try {
+              // Await the response from Notion API block update
+              const response = await notion.blocks.update({
+                block_id: idToUse,  // Cycle through the Ids array
+                paragraph: e.paragraph,
+              });
+              resolve(response);
+            } catch (error:any) {
+              resolve(`Error updating block ${idToUse}: ${error.message}`);
+            }
+          }, 3000 * (i%3)); // Increase the timeout delay per iteration
+        });
+      } else {
+        return Promise.resolve(null); // Return null if it's not a paragraph
       }
-    }
-    )
-    console.log(response);
-  } catch (e) { 
-    console.log(e)
-  }
+    });
   
+    const responses = await Promise.all(responsePromises);
+    console.log(responses);
+    try {
+      revalidatePath(`/journals`);
+      redirect(`/journals/${blockId}`);
+    } catch (err) { 
+    }
+
+  } catch (error) {
+    console.log("Error caught:", error);
+  }
 }

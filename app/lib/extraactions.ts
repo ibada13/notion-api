@@ -52,7 +52,6 @@ export function process_blocks_data(blocks: any) {
         }
       }
     })
-    console.log(pureblocks)
     const orgnizeddata = pureblocks.map((block:any, index:any, arr:any) => { 
       if (index % 2 == 0 && arr[index + 1]) { 
         try {
@@ -84,7 +83,6 @@ export function process_blocks_data(blocks: any) {
         
       }
     }).filter(Boolean)
-    console.log(orgnizeddata)
     return orgnizeddata;
 }
 

@@ -4,12 +4,13 @@ import { useParams } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
 import Form from "@/app/ui/journals/create-form";
 import { State } from "@/app/lib/definitions";
+import { headers } from "next/headers";
 export default function Edit_Journal() { 
     const { id } = useParams();
     const [Loading, SetLoading] = useState<boolean>(true);
     const [Error, SetError] = useState<boolean>(false);
     const [Journal, SetJournal] = useState();
-    const [Ids, SetIds] = useState<string[]>([]);
+    const [Ids, SetIds] = useState<{[key:string]:string}>({});
     const things_headers :string[]=["positive_things" , "negative_things" , "other_things"]
     const initialState: State = { message: null, errors: {} };
     
@@ -19,14 +20,14 @@ export default function Edit_Journal() {
         const get_journal_childs = async () => {
             if (id) { 
                 try {
-                    const ids: string[] = [];
+                    const ids: { [key: string]: string } = {};
                     const data = await Retrieveblockchildrens(id as string);
                     const things = data.reduce((acc: any, e: any, i: any) => {
-                        ids.push(e.id as string) 
+                        ids[i] = e.id
                         acc[things_headers[i]] = e.paragraph;
                         return acc; 
                     }, {});
-                    SetIds(ids.filter(Boolean))
+                    SetIds(ids)
                     things.title = "some title"
                     things.tags = "some tags test".split(" ")
                     console.log(things)
