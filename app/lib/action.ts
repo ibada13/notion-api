@@ -1,6 +1,6 @@
 'use server';
 const { Client } = require('@notionhq/client');
-import { redirect } from "next/navigation";
+import { permanentRedirect, redirect } from "next/navigation";
 import { child_block_data_type , color, rich_text_type, State, Tag} from "./definitions";
 import {z, ZodError} from 'zod';
 import { revalidatePath } from "next/cache";
@@ -125,46 +125,51 @@ export async function update_journal( blockId:string,Ids:{[key:string]:string},f
   }
   const { title, tags, things } = parsedData.data;
   const data = get_data({ title, tags, things }); 
-    // const response = await notion.blocks.children.append({
-    //   block_id: blockId,
-    //   children:data.children
-      
-  // });
+
   try {
-    // Using Promise.all to handle all the async requests
     const responsePromises = data.children.map((e, i) => {
       if (e.type === "paragraph") {
         const idToUse = Ids[acc];
-        console.log(Ids[acc])// Cycle through the 3 elements of Ids
+        console.log(Ids[acc])
         acc++;
         return new Promise((resolve) => {
           setTimeout(async () => {
             try {
-              // Await the response from Notion API block update
               const response = await notion.blocks.update({
-                block_id: idToUse,  // Cycle through the Ids array
+                block_id: idToUse,  
                 paragraph: e.paragraph,
               });
               resolve(response);
             } catch (error:any) {
               resolve(`Error updating block ${idToUse}: ${error.message}`);
             }
-          }, 3000 * (i%3)); // Increase the timeout delay per iteration
+          }, 3000 * (i%3)); 
         });
       } else {
-        return Promise.resolve(null); // Return null if it's not a paragraph
+        return Promise.resolve(null); 
       }
     });
   
-    const responses = await Promise.all(responsePromises);
+    const responses = await Promise.all(responsePromises.filter(Boolean));
     console.log(responses);
-    try {
-      revalidatePath(`/journals`);
-      redirect(`/journals/${blockId}`);
-    } catch (err) { 
-    }
-
+  
   } catch (error) {
     console.log("Error caught:", error);
   }
+  revalidatePath(`/journals`);
+  redirect(`/journals/${blockId}`);
 }
+
+export async function RetrievePage({ id }: {id:string}) { 
+  try { 
+    const response = await notion.pages.retrieve({
+      page_id:id
+    })
+    const data = Getimportant(response)
+    return gen_RetrievePages(data);
+  }
+  catch (err) {
+    console.log("err : " + err);
+  }
+  
+} 

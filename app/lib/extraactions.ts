@@ -19,24 +19,25 @@ export  function fakecipher(title: any) {
     console.log(cipher)
     console.log(AES.decrypt(cipher  ,String(process.env.KEY)).toString(enc.Utf8))
    }
-  /*some needed function in the projects */
 
 
-export function Getimportant(results: any) {
-    // console.log(results)
-    const pure_results = results.map((result: any) => { 
+  export function Getimportant(results: any) {
+    const processResult = (result: any) => {
       return {
         id: result.id,
-        created_time :result.created_time , 
-        updated_time : result.last_edited_time,
-        [result.properties.Name.id]:result.properties.Name.title[0]?.plain_text,
-        [result.properties.Tags.id]:GetTags(result)
-      }
-    })
-    return pure_results; 
-}
+        created_time: result.created_time,
+        updated_time: result.last_edited_time,
+        [result.properties.Name.id]: result.properties.Name.title[0]?.plain_text,
+        [result.properties.Tags.id]: GetTags(result),
+      };
+    };
   
-
+    if (Array.isArray(results)) {
+      return results.map(processResult);
+    } else {
+      return processResult(results);
+    }
+  }
 export function process_blocks_data(blocks: any) {
     const pureblocks = blocks.map((block: any) => { 
       if (block.type === "heading_1") {
@@ -88,28 +89,30 @@ export function process_blocks_data(blocks: any) {
 
 
 
+export function gen_RetrievePages(data: any) {
+  const processItem = (e: any) => {
+    try {
+      const title = AES.decrypt(String(e["title"]), String(process.env.KEY)).toString(enc.Utf8);
+      if (!title) {
+        throw new Error('Decryption resulted in null or empty string');
+      }
+      return {
+        ...e,
+        "title": title,
+      };
+    } catch (err) {
+      console.error("Decryption error:", err);
+      return {
+        ...e,
+      };
+    }
+  };
 
-export function gen_RetrievePages(data:any) { 
-  
-    const puredata = data.map((e: any) => { 
-      try {
-  
-        const title = AES.decrypt(String(e["title"]), String(process.env.KEY)).toString(enc.Utf8)
-        if (!title) {
-          throw new Error('Decryption resulted in null or empty string');
-        }
-        return {
-          ...e,
-          "title": title,
-        }
-      }
-      catch (err) { 
-        return {
-          ...e,
-        }
-      }
+  if (Array.isArray(data)) {
+    return data.map(processItem);
+  } else {
+    return processItem(data);
   }
-    )
-    return puredata
-  }
-  
+}
+
+
