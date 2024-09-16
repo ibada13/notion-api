@@ -4,11 +4,11 @@ import { useEffect, useState } from "react";
 
 export default function data() { 
     const [isLoading ,SetIsloading ]=useState<boolean>(true);
-    const Id: string = "101cc7edf729815d9672e7253e2d0b78";
+    const Id: string = "100cc7edf729814f99a0e32f27b8d1cf";
     useEffect(() => {
         const retrivingpage = async () => { 
             try {
-                const data = await RetrievePage({ id: Id });
+                const data = await RetrievePage(Id );
                 console.log(data)
             } catch (err) {
 

@@ -1,5 +1,5 @@
 'use client';
-import { Retrieveblockchildrens, update_journal } from "@/app/lib/action";
+import { Retrieveblockchildrens, RetrievePage, update_journal } from "@/app/lib/action";
 import { useParams } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
 import Form from "@/app/ui/journals/create-form";
@@ -21,15 +21,16 @@ export default function Edit_Journal() {
             if (id) { 
                 try {
                     const ids: { [key: string]: string } = {};
-                    const data = await Retrieveblockchildrens(id as string);
-                    const things = data.reduce((acc: any, e: any, i: any) => {
+                    const childs = await Retrieveblockchildrens(id as string);
+                    const data = await RetrievePage(id as string);
+                    const things = childs.reduce((acc: any, e: any, i: any) => {
                         ids[i] = e.id
                         acc[things_headers[i]] = e.paragraph;
                         return acc; 
                     }, {});
                     SetIds(ids)
-                    things.title = "some title"
-                    things.tags = "some tags test".split(" ")
+                    things.title =data.title
+                    things.tags = data.tags.split(" ");
                     console.log(things)
                     SetJournal(things)
                 } catch (e) {

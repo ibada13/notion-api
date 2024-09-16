@@ -5,10 +5,12 @@ import { child_block_data_type , color, rich_text_type, State, Tag} from "./defi
 import {z, ZodError} from 'zod';
 import { revalidatePath } from "next/cache";
 import { AES, enc, lib } from "crypto-ts";
-import { Getimportant ,process_blocks_data,gen_RetrievePages} from "./extraactions";
+import { Getimportant ,process_blocks_data, HandelTags} from "./extraactions";
 import { get_data, safe_data } from "./function_data";
 import { error } from "console";
 
+
+const TagId =  [process.env.DATABASE_TAGS_ID]
 const notion = new Client({ auth: process.env.NOTION_TOKEN });
 
 export async function RetriveDatabase()  {
@@ -77,8 +79,7 @@ export async function RetrievePages() {
         }
       ]
     })
-    const data = Getimportant(res.results)
-    return gen_RetrievePages(data);
+    return Getimportant(res.results);
   } catch (e){ 
     console.log(String(e))
   }
@@ -160,13 +161,14 @@ export async function update_journal( blockId:string,Ids:{[key:string]:string},f
   redirect(`/journals/${blockId}`);
 }
 
-export async function RetrievePage({ id }: {id:string}) { 
+export async function RetrievePage(id:string) { 
   try { 
     const response = await notion.pages.retrieve({
       page_id:id
     })
-    const data = Getimportant(response)
-    return gen_RetrievePages(data);
+    const data = Getimportant(response);
+
+    return HandelTags(data);
   }
   catch (err) {
     console.log("err : " + err);

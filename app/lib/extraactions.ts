@@ -1,5 +1,6 @@
 import { AES, enc } from "crypto-ts";
 
+const TagId =  [process.env.DATABASE_TAGS_ID]
 
 /*some extra funxtion that used in projects */
 
@@ -7,7 +8,7 @@ import { AES, enc } from "crypto-ts";
 export function GetTags(result:any) { 
     const Tags = result.properties.Tags.multi_select.map((tag: any) => {
       return {
-        id: tag.id, name: tag.name
+        id:tag.id , name: tag.name
       }
     })
     return Tags;
@@ -22,6 +23,7 @@ export  function fakecipher(title: any) {
 
 
   export function Getimportant(results: any) {
+    var data; 
     const processResult = (result: any) => {
       return {
         id: result.id,
@@ -33,10 +35,12 @@ export  function fakecipher(title: any) {
     };
   
     if (Array.isArray(results)) {
-      return results.map(processResult);
+      data =  results.map(processResult);
     } else {
-      return processResult(results);
+      data =  processResult(results);
     }
+    return handel_title_decryption(data)
+    
   }
 export function process_blocks_data(blocks: any) {
     const pureblocks = blocks.map((block: any) => { 
@@ -84,12 +88,14 @@ export function process_blocks_data(blocks: any) {
         
       }
     }).filter(Boolean)
-    return orgnizeddata;
+  
+  return orgnizeddata;
+    
 }
 
 
 
-export function gen_RetrievePages(data: any) {
+export function handel_title_decryption(data: any) {
   const processItem = (e: any) => {
     try {
       const title = AES.decrypt(String(e["title"]), String(process.env.KEY)).toString(enc.Utf8);
@@ -116,3 +122,10 @@ export function gen_RetrievePages(data: any) {
 }
 
 
+export function HandelTags(data: any) {
+  const tags = data[TagId as unknown as string].map((e:any) => { 
+    return e.name; 
+  })
+  data["tags"] = tags.join(" ");
+  return data; 
+ }
