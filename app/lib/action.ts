@@ -59,7 +59,6 @@ export async function CreateApage(prevstate:State,formData:FormData) {
   }
   
   revalidatePath('/journals')
-  redirect('/journals?message=' + encodeURIComponent("journal created suc"))
 }
 
 
