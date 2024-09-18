@@ -115,7 +115,7 @@ export async function TrashaApage(pageId:string) {
   
 }
 
-export async function update_journal( blockId:string,Ids:{[key:string]:string},formData: FormData):Promise<State | undefined> { 
+export async function update_journal( blockId:string,Ids:string[],formData: FormData):Promise<State | undefined> { 
   var acc: number = 0; 
   console.log(formData)
   const parsedData = safe_data(formData);
@@ -158,8 +158,7 @@ export async function update_journal( blockId:string,Ids:{[key:string]:string},f
   } catch (error) {
     console.log("Error caught:", error);
   }
-  revalidatePath(`/journals`);
-  redirect(`/journals/${blockId}`);
+  
 }
 
 export async function RetrievePage(id:string) { 
