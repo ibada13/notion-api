@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Cairo } from "next/font/google";
 import "./globals.css";
-
+import useNetworkStatus from "./lib/Isonline";
+import Error from "./ui/error/error";
 const cairo = Cairo({ subsets: ["latin"] });
 
 export const metadata: Metadata = {

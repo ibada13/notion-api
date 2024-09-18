@@ -79,9 +79,10 @@ export async function RetrievePages() {
         }
       ]
     })
+    
     return Getimportant(res.results);
   } catch (e){ 
-    console.log(String(e))
+    throw e;
   }
   
 }

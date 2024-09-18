@@ -5,10 +5,11 @@ import { useActionState, useEffect, useState } from "react";
 import Form from "@/app/ui/journals/create-form";
 import { State } from "@/app/lib/definitions";
 import { headers } from "next/headers";
+import Error from "@/app/ui/error/error";
 export default function Edit_Journal() { 
     const { id } = useParams();
     const [Loading, SetLoading] = useState<boolean>(true);
-    const [Error, SetError] = useState<boolean>(false);
+    const [vError, SetError] = useState<boolean>(false);
     const [Journal, SetJournal] = useState();
     const [Ids, SetIds] = useState<{[key:string]:string}>({});
     const things_headers :string[]=["positive_things" , "negative_things" , "other_things"]
@@ -31,7 +32,6 @@ export default function Edit_Journal() {
                     SetIds(ids)
                     things.title =data.title
                     things.tags = data.tags.split(" ");
-                    console.log(things)
                     SetJournal(things)
                 } catch (e) {
                     SetError(true)
@@ -45,8 +45,8 @@ export default function Edit_Journal() {
     if (Loading) {
         return <>Loading ... </>;
     }
-    else if (Error) {
-        return <>some error in retriving the journal </>
+    else if (vError) {
+        return <Error />
     }
     else { 
        return <Form formAction={formAction} journal={Journal}/>
