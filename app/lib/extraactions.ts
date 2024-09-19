@@ -44,10 +44,10 @@ export  function fakecipher(title: any) {
   }
 export function process_blocks_data(blocks: any) {
     const pureblocks = blocks.map((block: any) => { 
-      if (block.type === "heading_1") {
+      if (block.type === "Heading_1") {
 
         return {
-          content: block.heading_1.rich_text[0]?.plain_text,
+          content: block.Heading_1.rich_text[0]?.plain_text,
         }
       }
       else { 
@@ -68,8 +68,8 @@ export function process_blocks_data(blocks: any) {
           
           return {
             id:arr[index+1].id , 
-            heading: block.content,
-            heading_class: index == 0 ? "bg-green-500" : index == 2 ? "bg-red-500" : "bg-blue-500",
+            Heading: block.content,
+            Heading_class: index == 0 ? "bg-green-500" : index == 2 ? "bg-red-500" : "bg-blue-500",
             paragraph: decryptedParagraph,
             paragraph_class: index == 0 ? "text-green-500" : index == 2 ? "text-red-500" : "text-white",
             
@@ -78,8 +78,8 @@ export function process_blocks_data(blocks: any) {
           return {
               
             id:arr[index+1].id , 
-            heading: block.content,
-            heading_class: index == 0 ? "bg-green-500" : index == 2 ? "bg-red-500" : "bg-blue-500",
+            Heading: block.content,
+            Heading_class: index == 0 ? "bg-green-500" : index == 2 ? "bg-red-500" : "bg-blue-500",
             paragraph: String(arr[index+1]),
             paragraph_class: index == 0 ? "text-green-500" : index == 2 ? "text-red-500" : "text-white",
             

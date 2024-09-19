@@ -6,7 +6,8 @@ import { EditJournal, TrashJournal } from "../ui/buttons";
 import useSWR from "swr";
 import { Journal } from "../ui/journals/journal";
 import Error from "../ui/error/error";
-
+import Loading from "../ui/loading/loading";
+import Head from "next/head";
 export default function Journals() {
     const searchParams = useSearchParams();
     const message = searchParams.get('message');
@@ -16,7 +17,7 @@ export default function Journals() {
 
     // If data is loading
     if (isLoading) {
-        return <p>Loading ..........</p>;
+        return <Loading />;
     }
 
     // If there's an error
@@ -26,7 +27,10 @@ export default function Journals() {
     }
 
     // Render the journals if available
-    return (
+    return (<>
+            <Head>
+                <title>Journals</title>
+            </Head>
         <div className="h-screen">
             {/* Display the success message if available */}
             {message && (
@@ -46,5 +50,6 @@ export default function Journals() {
                 ))}
             </div>
         </div>
+    </>
     );
 }

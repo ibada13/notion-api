@@ -1,11 +1,15 @@
-import { SiThingiverse } from "react-icons/si";
-
+import Head from "next/head";
 export default function Form({ formAction, journal }: { formAction: any, journal?: {title:string , tags: string [] ,positive_things:string , negative_things:string , other_things:string} }) { 
 
 
     return (
+        <>
+            <Head>
+                <title>
+                    Creat | Edit Journal
+                </title>
+            </Head>
         <div className=" w-full h-full flex justify-center pt-5 ">
-            
             <form action={formAction} className=" rounded-lg h-auto w-3/4 flex flex-col  px-6 pb-3 pt-3">
 
                 <div className="mb-5 h-auto">
@@ -36,5 +40,6 @@ export default function Form({ formAction, journal }: { formAction: any, journal
 
             </form>
         </div>
+        </>
     );
 }

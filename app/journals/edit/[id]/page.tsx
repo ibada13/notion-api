@@ -4,7 +4,6 @@ import { useParams, useRouter } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
 import Form from "@/app/ui/journals/create-form";
 import { State } from "@/app/lib/definitions";
-import { headers } from "next/headers";
 import Error from "@/app/ui/error/error";
 export default function Edit_Journal() { 
     const { id } = useParams();
@@ -12,7 +11,7 @@ export default function Edit_Journal() {
     const [vError, SetError] = useState<string | null>(null);
     const [Journal, SetJournal] = useState();
     const [Ids, SetIds] = useState<string[]>([]);
-    const things_headers :string[]=["positive_things" , "negative_things" , "other_things"]
+    const things_Headers :string[]=["positive_things" , "negative_things" , "other_things"]
     const initialState: State = { message: null, errors: {} };
     const router = useRouter();
     const formAction = async (formData: any) => {
@@ -35,7 +34,7 @@ export default function Edit_Journal() {
                     const data = await RetrievePage(id as string);
                     const things = childs.reduce((acc: any, e: any, i: any) => {
                         ids[i] = e.id
-                        acc[things_headers[i]] = e.paragraph;
+                        acc[things_Headers[i]] = e.paragraph;
                         return acc; 
                     }, {});
                     SetIds(ids)
@@ -52,7 +51,7 @@ export default function Edit_Journal() {
         get_journal_childs()
     },[id])
     if (Loading) {
-        return <>Loading ... </>;
+        return Loading;
     }
     else if (vError) {
         return <Error error={vError} />

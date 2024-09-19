@@ -28,8 +28,8 @@ export function get_data({ title, tags, things }: { title: string, tags: string[
     },
     children: [
       {
-        "type": "heading_1",
-        "heading_1": {
+        "type": "Heading_1",
+        "Heading_1": {
           "rich_text": [{
             "type": "text",
             "text": {
@@ -60,8 +60,8 @@ export function get_data({ title, tags, things }: { title: string, tags: string[
         }
       },
       {
-        "type": "heading_1",
-        "heading_1": {
+        "type": "Heading_1",
+        "Heading_1": {
           "rich_text": [{
             "type": "text",
             "text": {
@@ -94,8 +94,8 @@ export function get_data({ title, tags, things }: { title: string, tags: string[
             }] as rich_text_type
         }
       }, {
-        "type": "heading_1",
-        "heading_1": {
+        "type": "Heading_1",
+        "Heading_1": {
           "rich_text": [{
             "type": "text",
             "text": {
